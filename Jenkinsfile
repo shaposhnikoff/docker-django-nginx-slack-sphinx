@@ -18,7 +18,7 @@ node {
         container_name = "django-slack-sphinx"
         docker_env_file = "testing.env"
 //      def docker_env_values = readProperties file: "./${docker_env_file}"
-        def docker_env_values = readProperties file: 'testing.env'
+        docker_env_values = readProperties file: 'testing.env'
 
 
 
