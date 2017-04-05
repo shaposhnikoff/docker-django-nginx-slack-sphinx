@@ -17,7 +17,10 @@ node {
         maintainer_name = "jayjohnson"
         container_name = "django-slack-sphinx"
         docker_env_file = "testing.env"
-        def docker_env_values = readProperties file: "./${docker_env_file}"
+//      def docker_env_values = readProperties file: "./${docker_env_file}"
+        def docker_env_values = readProperties file: 'testing.env'
+
+
 
         // Assign variables based off the env file
         default_root_volume = "${docker_env_values.ENV_DEFAULT_ROOT_VOLUME}"
