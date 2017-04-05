@@ -1,7 +1,40 @@
 #!groovy
 
 node {
-    
+   
+
+
+
+
+ENV_BASE_HOMEDIR=/opt
+
+# For Django:
+ENV_BASE_REPO_DIR=/opt/containerfiles/django
+ENV_BASE_DATA_DIR=/opt/containerfiles/django/data
+ENV_DEFAULT_ROOT_VOLUME=/opt/web
+ENV_DOC_SOURCE_DIR=/opt/web/django/blog/source
+ENV_DOC_OUTPUT_DIR=/opt/web/django/templates
+ENV_STATIC_OUTPUT_DIR=/opt/web/static
+ENV_MEDIA_DIR=/opt/web/media
+ENV_BASE_DOMAIN=jaypjohnson.com
+ENV_SLACK_BOTNAME=bugbot
+ENV_SLACK_CHANNEL=debugging
+ENV_SLACK_NOTIFY_USER=jay
+ENV_SLACK_ENVNAME=djangoapp
+ENV_DJANGO_DEBUG_MODE=True
+ENV_SERVER_MODE=PROD # DEV means the django container uses: python ./manage.py runserver, if NOT DEV UWSGI is used
+ENV_DEFAULT_PORT=80
+
+# These are not valid values:
+ENV_SLACK_TOKEN=xoxb-51351043345-Lzwmto5IMVb8UK36MghZYMEi
+ENV_GOOGLE_ANALYTICS_CODE=UA-79840762-99
+
+# For nginx:
+ENV_BASE_NGINX_CONFIG=/root/containerfiles/base_nginx.conf
+ENV_DERIVED_NGINX_CONFIG=/root/containerfiles/non_ssl.conf
+ENV_DEFAULT_ROOT_VOLUME=/opt/web
+
+
     // Setup the Docker Registry (Docker Hub) + Credentials 
     registry_url = "https://index.docker.io/v1/" // Docker Hub
     docker_creds_id = "shaposhnikoff-Dockerhub" // name of the Jenkins Credentials ID
@@ -18,16 +51,16 @@ node {
         container_name = "django-slack-sphinx"
         docker_env_file = "testing.env"
 //      def docker_env_values = readProperties file: "./${docker_env_file}"
-        docker_env_values = readProperties file: 'testing.env'
+//        docker_env_values = readProperties file: 'testing.env'
 
 
 
         // Assign variables based off the env file
-        default_root_volume = "${docker_env_values.ENV_DEFAULT_ROOT_VOLUME}"
-        doc_source_dir = "${docker_env_values.ENV_DOC_SOURCE_DIR}"
-        doc_output_dir = "${docker_env_values.ENV_DOC_OUTPUT_DIR}"
-        static_output_dir = "${docker_env_values.ENV_STATIC_OUTPUT_DIR}"
-        media_dir = "${docker_env_values.ENV_MEDIA_DIR}"
+        default_root_volume = "${ENV_DEFAULT_ROOT_VOLUME}"
+        doc_source_dir = "${ENV_DOC_SOURCE_DIR}"
+        doc_output_dir = "${ENV_DOC_OUTPUT_DIR}"
+        static_output_dir = "${ENV_STATIC_OUTPUT_DIR}"
+        media_dir = "${ENV_MEDIA_DIR}"
 
         stage "Building"
         echo "Building Django with docker.build(${maintainer_name}/${container_name}:${build_tag})"
