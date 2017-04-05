@@ -1,51 +1,14 @@
 #!groovy
 
 node {
-   
-
-
-
-
-def ENV_BASE_HOMEDIR=/opt
-
-
-def ENV_BASE_REPO_DIR=/opt/containerfiles/django
-def ENV_BASE_DATA_DIR=/opt/containerfiles/django/data
-def ENV_DEFAULT_ROOT_VOLUME=/opt/web
-def ENV_DOC_SOURCE_DIR=/opt/web/django/blog/source
-def ENV_DOC_OUTPUT_DIR=/opt/web/django/templates
-//ENV_STATIC_OUTPUT_DIR=/opt/web/static
-//ENV_MEDIA_DIR=/opt/web/media
-//ENV_BASE_DOMAIN=jaypjohnson.com
-//ENV_SLACK_BOTNAME=bugbot
-//ENV_SLACK_CHANNEL=debugging
-//ENV_SLACK_NOTIFY_USER=jay
-///ENV_SLACK_ENVNAME=djangoapp
-//ENV_DJANGO_DEBUG_MODE=True
-//ENV_SERVER_MODE=PROD # DEV means the django container uses: python ./manage.py runserver, if NOT DEV UWSGI is used
-//ENV_DEFAULT_PORT=80
-
-//# These are not valid values:
-//ENV_SLACK_TOKEN=xoxb-51351043345-Lzwmto5IMVb8UK36MghZYMEi
-//ENV_GOOGLE_ANALYTICS_CODE=UA-79840762-99
-
-//# For nginx:
-//ENV_BASE_NGINX_CONFIG=/root/containerfiles/base_nginx.conf
-//ENV_DERIVED_NGINX_CONFIG=/root/containerfiles/non_ssl.conf
-//ENV_DEFAULT_ROOT_VOLUME=/opt/web
-
-
     // Setup the Docker Registry (Docker Hub) + Credentials 
     registry_url = "https://index.docker.io/v1/" // Docker Hub
     docker_creds_id = "shaposhnikoff-Dockerhub" // name of the Jenkins Credentials ID
     build_tag = "testing" // default tag to push for to the registry
-    
     stage 'Checking out GitHub Repo'
     git url: 'https://github.com/shaposhnikoff/docker-django-nginx-slack-sphinx.git'
-    
     stage 'Building Django Container for Docker Hub'
     docker.withRegistry("${registry_url}", "${docker_creds_id}") {
-    
         // Set up the container to build 
         maintainer_name = "jayjohnson"
         container_name = "django-slack-sphinx"
@@ -56,23 +19,20 @@ def ENV_DOC_OUTPUT_DIR=/opt/web/django/templates
 
 
         // Assign variables based off the env file
-        default_root_volume = "${ENV_DEFAULT_ROOT_VOLUME}"
-        doc_source_dir = "${ENV_DOC_SOURCE_DIR}"
-        doc_output_dir = "${ENV_DOC_OUTPUT_DIR}"
-        static_output_dir = "${ENV_STATIC_OUTPUT_DIR}"
-        media_dir = "${ENV_MEDIA_DIR}"
+        default_root_volume = "/opt"
+        doc_source_dir = "/tmp"
+        doc_output_dir = "/tmp"
+        static_output_dir = "/tmp"
+        media_dir = "/tmp"
 
         stage "Building"
         echo "Building Django with docker.build(${maintainer_name}/${container_name}:${build_tag})"
         container = docker.build("${maintainer_name}/${container_name}:${build_tag}", 'django')
         try {
-            
             // Start Testing
             stage "Running Django container"
-            
             // Run the container with the env file, mounted volumes and the ports:
             docker.image("${maintainer_name}/${container_name}:${build_tag}").withRun("--name=${container_name} --env-file ${docker_env_file} -e ENV_SERVER_MODE=DEV -v ${default_root_volume}:${default_root_volume} -v ${doc_source_dir}:${doc_source_dir} -v ${doc_output_dir}:${doc_output_dir} -v ${static_output_dir}:${static_output_dir} -v ${media_dir}:${media_dir} -p 82:80 -p 444:443")  { c ->
-                   
                 // wait for the django server to be ready for testing
                 // the 'waitUntil' block needs to return true to stop waiting
                 // in the future this will be handy to specify waiting for a max interval: 
