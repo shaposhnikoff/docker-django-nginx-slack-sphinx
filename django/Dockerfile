@@ -18,7 +18,7 @@ RUN echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-
 RUN echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections 
 RUN apt-get -y install oracle-java8-installer
 
-ADD https://shaposhnikoff.info/hybris-commerce-suite-5.5.1.4.tar.gz /opt/
+ADD hybris-commerce-suite-5.5.1.4.tar.gz /opt/
 COPY mysql-connector-java-5.1.37-bin.jar /opt/hybris/bin/platform/lib/dbdriver/mysql-connector-java-5.1.37-bin.jar
 
 RUN apt-get update && \

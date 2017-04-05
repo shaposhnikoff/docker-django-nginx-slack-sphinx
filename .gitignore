@@ -3,4 +3,5 @@
 *.swp
 *.db
 commit.sh
+*.gz
 
