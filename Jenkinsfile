@@ -8,7 +8,7 @@ node {
     build_tag = "testing" // default tag to push for to the registry
     
     stage 'Checking out GitHub Repo'
-    git url: 'https://github.com/jay-johnson/docker-django-nginx-slack-sphinx.git'
+    git url: 'https://github.com/shaposhnikoff/docker-django-nginx-slack-sphinx.git'
     
     stage 'Building Django Container for Docker Hub'
     docker.withRegistry("${registry_url}", "${docker_creds_id}") {
